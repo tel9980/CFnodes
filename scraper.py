@@ -96,6 +96,8 @@ PROBE = os.environ.get("PROBE", "true").strip().lower() not in ("0", "false", "n
 PROBE_TIMEOUT = float(os.environ.get("PROBE_TIMEOUT", "3"))
 PROBE_WORKERS = int(os.environ.get("PROBE_WORKERS", "96"))
 PROBE_MIN_ALIVE_RATIO = float(os.environ.get("PROBE_MIN_ALIVE_RATIO", "0.05"))
+STABLE_ROUNDS = int(os.environ.get("STABLE_ROUNDS", "2"))   # 连续几轮探活都活才进订阅
+ALIVE_STATE = os.environ.get("ALIVE_STATE", "alive.json")   # 跨轮存活状态（放在 output/ 里随仓库滚动）
 FETCH_WORKERS = int(os.environ.get("FETCH_WORKERS", "8"))
 FETCH_TIMEOUT = float(os.environ.get("FETCH_TIMEOUT", "20"))
 MAX_NODES = int(os.environ.get("MAX_NODES", "2000"))
@@ -331,6 +333,56 @@ def probe_nodes(nodes: list[dict]) -> tuple[list[dict], dict]:
     return alive + udp_nodes, stats
 
 
+def apply_stability_filter(nodes: list[dict], output_dir: str) -> tuple[list[dict], dict]:
+    """连续 STABLE_ROUNDS 轮探活都活着才发布。
+
+    为什么：TCP 能连 ≠ 能正常代理，很多节点是"刚死但端口还开着"。用跨轮状态过滤掉抖动节点，
+    订阅里剩下的稳定性明显更好。UDP 类（hysteria2 等）无法 TCP 探活，不做过滤直接保留。
+
+    状态文件 <output_dir>/alive.json = {"streak": {端点: 连续存活轮数}}。
+    首次运行没有状态文件 → 全部放行（streak 记 1），避免第一天把订阅清空。
+    """
+    state_path = os.path.join(output_dir, ALIVE_STATE)
+    prev: dict[str, int] = {}
+    fresh = True
+    try:
+        with open(state_path, encoding="utf-8") as f:
+            data = json.load(f)
+        prev = {str(k): int(v) for k, v in (data.get("streak") or {}).items()}
+        fresh = False
+    except FileNotFoundError:
+        pass
+    except Exception as exc:  # noqa: BLE001
+        print(f"[!] 读取 {state_path} 失败（{exc}），按首次运行处理")
+
+    keep: list[dict] = []
+    held = 0
+    streak: dict[str, int] = {}
+    for n in nodes:
+        if n.get("latency_ms") is None:          # UDP 类：无法探活，直接保留
+            keep.append(n)
+            continue
+        key = f"{n['proto']}|{n['host']}|{n['port']}"
+        s = prev.get(key, 0) + 1
+        streak[key] = s
+        if fresh or s >= STABLE_ROUNDS:
+            keep.append(n)
+        else:
+            held += 1
+
+    try:
+        os.makedirs(output_dir, exist_ok=True)
+        write_file(state_path, json.dumps(
+            {"updated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "streak": streak},
+            ensure_ascii=False, indent=0))
+    except Exception as exc:  # noqa: BLE001
+        print(f"[!] 写 {state_path} 失败：{exc}")
+
+    print(f"[*] 连续存活过滤：保留 {len(keep)} 条，暂缓 {held} 条"
+          f"（首次运行则全部放行，阈值 {STABLE_ROUNDS} 轮）")
+    return keep, {"stable_rounds": STABLE_ROUNDS, "stable_kept": len(keep),
+                  "stable_held_back": held, "stable_state": state_path}
+
 # ---------------------------------------------------------------- 重命名 & 输出
 
 def rename_node(node: dict, index: int) -> str:
@@ -469,6 +521,9 @@ def main() -> int:
     if do_probe and nodes:
         nodes, probe_stats = probe_nodes(nodes)
         probe_stats["enabled"] = True
+        # 4.5) 连续存活过滤：只有连续 N 轮都活的节点才进订阅（UDP 类不过滤）
+        nodes, stable_stats = apply_stability_filter(nodes, args.output_dir)
+        probe_stats.update(stable_stats)
     elif nodes:
         for n in nodes:
             n["latency_ms"] = None

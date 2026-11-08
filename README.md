@@ -39,6 +39,7 @@ https://raw.githubusercontent.com/tel9980/CFnodes/main/output/sub.txt
 | 清洗 | 只保留 vmess / vless / ss / ssr / trojan / tuic / hysteria2 协议 |
 | 去重 | 按「协议 + 域名/ IP + 端口」合并，同一台机器只留一条 |
 | 探活 | 并发 TCP 探测（96 线程），死节点直接剔除；UDP 协议（tuic / hysteria2）无法探测，标记为未验证 |
+| 连续存活 | 只有**连续两轮**探活都通过的节点才进订阅（状态记在 `output/alive.json`），过滤掉「端口开着但用不了」的抖动节点；想关掉就设 `STABLE_ROUNDS=1` |
 | 排序 | 按实测延迟从快到慢 |
 | 加密 | 可选：配置 `SUB_PASSWORD` 后额外产出 `output/encrypted_sub.txt`（AES-128-CBC） |
 
