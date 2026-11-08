@@ -33,6 +33,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from urllib.parse import quote, unquote, urlsplit
 
+from convert import to_clash_provider, to_singbox_config
+
 try:  # requests 优先，缺失时退回标准库，保证脚本在裸环境也能跑
     import requests  # type: ignore
 
@@ -385,6 +387,22 @@ def apply_stability_filter(nodes: list[dict], output_dir: str) -> tuple[list[dic
 
 # ---------------------------------------------------------------- 重命名 & 输出
 
+PROTO_ORDER = {"vless": 0, "vmess": 1, "trojan": 2, "ss": 3, "hysteria2": 4, "tuic": 5, "ssr": 6}
+
+
+def sort_nodes(nodes: list[dict]) -> list[dict]:
+    """按协议分组、组内按延迟从快到慢排。
+
+    好处：客户端导入后同一协议的节点挨在一起；订阅列表里最快的节点永远在前排，
+    而不是每次运行都按抓到顺序乱跳。
+    """
+    return sorted(nodes, key=lambda n: (
+        PROTO_ORDER.get(n["proto"], 9),
+        n.get("latency_ms") if n.get("latency_ms") is not None else float("inf"),
+        n["host"], n["port"],
+    ))
+
+
 def rename_node(node: dict, index: int) -> str:
     new_name = f"{CUSTOM_REMARK} {index:03d}"
     line = node["line"]
@@ -533,6 +551,7 @@ def main() -> int:
         print(f"[*] 按上限截断：{len(nodes)} -> {args.limit}")
         nodes = nodes[: args.limit]
 
+    nodes = sort_nodes(nodes)
     final_lines = [rename_node(n, i) for i, n in enumerate(nodes, 1)]
     raw_text = "\n".join(final_lines)
     sub_b64 = base64.b64encode(raw_text.encode("utf-8")).decode("utf-8")
@@ -540,6 +559,30 @@ def main() -> int:
     os.makedirs(args.output_dir, exist_ok=True)
     write_file(os.path.join(args.output_dir, "nodes.txt"), raw_text)
     write_file(os.path.join(args.output_dir, "sub.txt"), sub_b64)
+
+    # 客户端格式：mihomo/Clash 的 provider 文件 + sing-box 完整配置（解析失败的节点自动跳过）
+    def _namer(i: int) -> str:
+        return f"{CUSTOM_REMARK} {i:03d}"
+
+    client_stats: dict[str, object] = {}
+    try:
+        clash_text = to_clash_provider(nodes, _namer)
+        write_file(os.path.join(args.output_dir, "clash.yaml"), clash_text)
+        client_stats["clash_nodes"] = clash_text.count("\n  - name:") + clash_text.count("\n  - \"name\":")
+        client_stats["clash_kb"] = round(len(clash_text.encode("utf-8")) / 1024, 1)
+    except Exception as exc:  # noqa: BLE001
+        print(f"[!] 生成 clash.yaml 失败：{type(exc).__name__}: {exc}")
+    try:
+        sb_cfg = to_singbox_config(nodes, _namer)
+        sb_text = json.dumps(sb_cfg, ensure_ascii=False, indent=1)
+        write_file(os.path.join(args.output_dir, "sing-box.json"), sb_text)
+        client_stats["singbox_nodes"] = max(0, len(sb_cfg["outbounds"]) - 2)
+        client_stats["singbox_kb"] = round(len(sb_text.encode("utf-8")) / 1024, 1)
+    except Exception as exc:  # noqa: BLE001
+        print(f"[!] 生成 sing-box.json 失败：{type(exc).__name__}: {exc}")
+    if client_stats:
+        print(f"[*] 客户端格式：clash {client_stats.get('clash_nodes')} 条 / "
+              f"sing-box {client_stats.get('singbox_nodes')} 条")
 
     enc_status = "skipped"
     if SUB_PASSWORD and SUB_PASSWORD.lower() not in _PLACEHOLDER_PASSWORDS:
@@ -572,13 +615,14 @@ def main() -> int:
         "by_protocol": proto_count,
         "encrypted_output": enc_status,
         "remark_prefix": CUSTOM_REMARK,
+        "clients": client_stats,
     }
     write_file(os.path.join(args.output_dir, "stats.json"),
                json.dumps(stats, ensure_ascii=False, indent=2))
     write_file(os.path.join(args.output_dir, "summary.md"), render_summary(stats))
 
     print(f"[*] 完成：{len(nodes)} 条节点，协议分布 {proto_count}，"
-          f"耗时 {stats['duration_s']}s -> {args.output_dir}/{{nodes.txt,sub.txt,stats.json,summary.md}}")
+          f"耗时 {stats['duration_s']}s -> {args.output_dir}/{{nodes.txt,sub.txt,clash.yaml,sing-box.json,stats.json,summary.md}}")
 
     if not nodes:
         print("[!] 结果为空，请检查订阅源与网络")

@@ -6,11 +6,20 @@
 
 ## 一、订阅地址
 
+**大多数客户端用这一条就够**（v2rayNG / v2rayN / Shadowrocket / Clash 系列都认）：
+
 ```
 https://raw.githubusercontent.com/tel9980/CFnodes/main/output/sub.txt
 ```
 
-复制这一行，粘到客户端里就行。**地址永久不变**，节点会自动更新。
+如果你的客户端只吃 **Clash / mihomo** 或 **sing-box** 的原生格式，用下面这两条：
+
+```
+Clash / mihomo： https://raw.githubusercontent.com/tel9980/CFnodes/main/output/clash.yaml
+sing-box      ： https://raw.githubusercontent.com/tel9980/CFnodes/main/output/sing-box.json
+```
+
+复制粘到客户端里就行。**三条地址都永久不变**，节点会自动更新；同一个节点在三份文件里是同名的，换客户端不用重新挑。
 
 ## 二、客户端怎么用
 
@@ -41,6 +50,7 @@ https://raw.githubusercontent.com/tel9980/CFnodes/main/output/sub.txt
 | 探活 | 并发 TCP 探测（96 线程），死节点直接剔除；UDP 协议（tuic / hysteria2）无法探测，标记为未验证 |
 | 连续存活 | 只有**连续两轮**探活都通过的节点才进订阅（状态记在 `output/alive.json`），过滤掉「端口开着但用不了」的抖动节点；想关掉就设 `STABLE_ROUNDS=1` |
 | 排序 | 按实测延迟从快到慢 |
+| 多格式 | 同一批节点同时输出 `sub.txt`（通用订阅）、`clash.yaml`（mihomo / Clash Verge 可直接当 provider 用）、`sing-box.json`（完整配置，含自动选延迟最低的 selector） |
 | 加密 | 可选：配置 `SUB_PASSWORD` 后额外产出 `output/encrypted_sub.txt`（AES-128-CBC） |
 
 **每次运行的明细**都在 Actions 页面的 Summary 里，也保存在 `output/stats.json`：
@@ -62,7 +72,15 @@ https://raw.githubusercontent.com/tel9980/CFnodes/main/output/sub.txt
 
 ## 六、可选：用 Cloudflare Worker 加速
 
-raw.githubusercontent.com 在国内偶尔不可达，可以在 Cloudflare Workers 里建一个反代（**注意地址要指向本仓库，不要指向别人的仓库**）：
+raw.githubusercontent.com 在国内偶尔不可达。**这个仓库已经配好了一个反代**，可以直接用：
+
+```
+https://ag.1211.cc.cd/sub/sub.txt      ← 对应上面的 sub.txt
+https://ag.1211.cc.cd/sub/clash.yaml   ← 对应 clash.yaml
+https://ag.1211.cc.cd/sub/sing-box.json
+```
+
+反代挂了也不影响，原地址一直可用。想自己也建一个，在 Cloudflare Workers 里贴下面这段（**注意地址要指向本仓库，不要指向别人的仓库**）：
 
 ```js
 export default {
