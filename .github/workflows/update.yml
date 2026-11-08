@@ -2,7 +2,7 @@ name: Auto Scrape Nodes
 
 on:
   schedule:
-    - cron: "0 * * * *"   # 每小时检查一次（GitHub 会限流，实际约 4~6 小时跑一次）
+    - cron: "0 */12 * * *"   # 每 12 小时一次：UTC 00:00 / 12:00 = 北京时间 08:00 / 20:00
   workflow_dispatch:       # 也可在 Actions 页面手动点 Run workflow
 
 permissions:
