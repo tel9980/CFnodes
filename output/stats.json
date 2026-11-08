@@ -1,6 +1,6 @@
 {
-  "generated_at_utc": "2026-11-08T00:12:16Z",
-  "duration_s": 24.5,
+  "generated_at_utc": "2026-11-08T02:30:35Z",
+  "duration_s": 24.6,
   "sources": {
     "https://cdn.jsdelivr.net/gh/Pawdroid/Free-servers@main/sub": {
       "ok": true,
@@ -14,8 +14,8 @@
     },
     "https://raw.githubusercontent.com/ermaozi/get_subscribe/main/subscribe/v2ray.txt": {
       "ok": true,
-      "lines": 515,
-      "parsed": 486
+      "lines": 613,
+      "parsed": 500
     },
     "https://raw.githubusercontent.com/chengaopan/AutoMergePublicNodes/master/list.txt": {
       "ok": true,
@@ -43,28 +43,32 @@
       "parsed": 0
     }
   },
-  "parsed": 1480,
+  "parsed": 1494,
   "rejected": {
-    "parse_fail": 136,
+    "parse_fail": 220,
     "blocked_host": 0,
     "blocked_name": 0
   },
-  "duplicate_lines": 229,
-  "duplicate_endpoints": 382,
+  "duplicate_lines": 425,
+  "duplicate_endpoints": 252,
   "probe": {
-    "tcp_total": 822,
-    "tcp_alive": 646,
-    "udp_unverified": 47,
-    "alive_ratio": 0.7859,
-    "enabled": true
+    "tcp_total": 772,
+    "tcp_alive": 606,
+    "udp_unverified": 45,
+    "alive_ratio": 0.785,
+    "enabled": true,
+    "stable_rounds": 2,
+    "stable_kept": 647,
+    "stable_held_back": 4,
+    "stable_state": "output/alive.json"
   },
-  "final": 693,
+  "final": 647,
   "by_protocol": {
-    "vless": 265,
-    "vmess": 120,
-    "ss": 213,
-    "trojan": 48,
-    "hysteria2": 47
+    "trojan": 46,
+    "vmess": 115,
+    "vless": 235,
+    "ss": 206,
+    "hysteria2": 45
   },
   "encrypted_output": "skipped",
   "remark_prefix": "科技共享-开源节点"
