@@ -1,6 +1,6 @@
 {
-  "generated_at_utc": "2026-11-08T02:30:35Z",
-  "duration_s": 24.6,
+  "generated_at_utc": "2026-11-09T03:45:27Z",
+  "duration_s": 17.0,
   "sources": {
     "https://cdn.jsdelivr.net/gh/Pawdroid/Free-servers@main/sub": {
       "ok": true,
@@ -14,13 +14,13 @@
     },
     "https://raw.githubusercontent.com/ermaozi/get_subscribe/main/subscribe/v2ray.txt": {
       "ok": true,
-      "lines": 613,
-      "parsed": 500
+      "lines": 519,
+      "parsed": 490
     },
     "https://raw.githubusercontent.com/chengaopan/AutoMergePublicNodes/master/list.txt": {
       "ok": true,
-      "lines": 530,
-      "parsed": 423
+      "lines": 454,
+      "parsed": 431
     },
     "https://raw.githubusercontent.com/ts-sf/fly/main/v2": {
       "ok": true,
@@ -43,33 +43,40 @@
       "parsed": 0
     }
   },
-  "parsed": 1494,
+  "parsed": 1492,
   "rejected": {
-    "parse_fail": 220,
+    "parse_fail": 52,
     "blocked_host": 0,
     "blocked_name": 0
   },
-  "duplicate_lines": 425,
-  "duplicate_endpoints": 252,
+  "duplicate_lines": 248,
+  "duplicate_endpoints": 394,
   "probe": {
-    "tcp_total": 772,
-    "tcp_alive": 606,
-    "udp_unverified": 45,
-    "alive_ratio": 0.785,
+    "tcp_total": 804,
+    "tcp_alive": 639,
+    "udp_unverified": 46,
+    "alive_ratio": 0.7948,
     "enabled": true,
     "stable_rounds": 2,
-    "stable_kept": 647,
-    "stable_held_back": 4,
+    "stable_kept": 508,
+    "stable_held_back": 177,
     "stable_state": "output/alive.json"
   },
-  "final": 647,
+  "final": 508,
   "by_protocol": {
-    "trojan": 46,
-    "vmess": 115,
-    "vless": 235,
-    "ss": 206,
-    "hysteria2": 45
+    "vless": 182,
+    "vmess": 35,
+    "trojan": 47,
+    "ss": 197,
+    "hysteria2": 46,
+    "ssr": 1
   },
   "encrypted_output": "skipped",
-  "remark_prefix": "科技共享-开源节点"
+  "remark_prefix": "科技共享-开源节点",
+  "clients": {
+    "clash_nodes": 507,
+    "clash_kb": 120.1,
+    "singbox_nodes": 507,
+    "singbox_kb": 164.3
+  }
 }
