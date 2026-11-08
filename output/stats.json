@@ -1,0 +1,71 @@
+{
+  "generated_at_utc": "2026-11-08T00:12:16Z",
+  "duration_s": 24.5,
+  "sources": {
+    "https://cdn.jsdelivr.net/gh/Pawdroid/Free-servers@main/sub": {
+      "ok": true,
+      "lines": 20,
+      "parsed": 20
+    },
+    "https://cdn.jsdelivr.net/gh/mfuu/v2ray@master/v2ray": {
+      "ok": false,
+      "lines": 0,
+      "parsed": 0
+    },
+    "https://raw.githubusercontent.com/ermaozi/get_subscribe/main/subscribe/v2ray.txt": {
+      "ok": true,
+      "lines": 515,
+      "parsed": 486
+    },
+    "https://raw.githubusercontent.com/chengaopan/AutoMergePublicNodes/master/list.txt": {
+      "ok": true,
+      "lines": 530,
+      "parsed": 423
+    },
+    "https://raw.githubusercontent.com/ts-sf/fly/main/v2": {
+      "ok": true,
+      "lines": 201,
+      "parsed": 201
+    },
+    "https://raw.githubusercontent.com/mahdibland/ShadowsocksAggregator/master/Eternity": {
+      "ok": true,
+      "lines": 200,
+      "parsed": 200
+    },
+    "https://raw.githubusercontent.com/roosterkid/openproxylist/main/V2RAY_BASE64.txt": {
+      "ok": true,
+      "lines": 150,
+      "parsed": 150
+    },
+    "https://gcore.jsdelivr.net/gh/aews/jd2/v20528.txt": {
+      "ok": false,
+      "lines": 0,
+      "parsed": 0
+    }
+  },
+  "parsed": 1480,
+  "rejected": {
+    "parse_fail": 136,
+    "blocked_host": 0,
+    "blocked_name": 0
+  },
+  "duplicate_lines": 229,
+  "duplicate_endpoints": 382,
+  "probe": {
+    "tcp_total": 822,
+    "tcp_alive": 646,
+    "udp_unverified": 47,
+    "alive_ratio": 0.7859,
+    "enabled": true
+  },
+  "final": 693,
+  "by_protocol": {
+    "vless": 265,
+    "vmess": 120,
+    "ss": 213,
+    "trojan": 48,
+    "hysteria2": 47
+  },
+  "encrypted_output": "skipped",
+  "remark_prefix": "科技共享-开源节点"
+}
