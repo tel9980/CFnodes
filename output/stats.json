@@ -1,11 +1,11 @@
 {
-  "generated_at_utc": "2026-11-09T03:45:27Z",
-  "duration_s": 17.0,
+  "generated_at_utc": "2026-11-14T17:29:08Z",
+  "duration_s": 19.3,
   "sources": {
     "https://cdn.jsdelivr.net/gh/Pawdroid/Free-servers@main/sub": {
       "ok": true,
-      "lines": 20,
-      "parsed": 20
+      "lines": 10,
+      "parsed": 10
     },
     "https://cdn.jsdelivr.net/gh/mfuu/v2ray@master/v2ray": {
       "ok": false,
@@ -14,12 +14,12 @@
     },
     "https://raw.githubusercontent.com/ermaozi/get_subscribe/main/subscribe/v2ray.txt": {
       "ok": true,
-      "lines": 519,
-      "parsed": 490
+      "lines": 527,
+      "parsed": 496
     },
     "https://raw.githubusercontent.com/chengaopan/AutoMergePublicNodes/master/list.txt": {
       "ok": true,
-      "lines": 454,
+      "lines": 463,
       "parsed": 431
     },
     "https://raw.githubusercontent.com/ts-sf/fly/main/v2": {
@@ -43,40 +43,40 @@
       "parsed": 0
     }
   },
-  "parsed": 1492,
+  "parsed": 1488,
   "rejected": {
-    "parse_fail": 52,
+    "parse_fail": 63,
     "blocked_host": 0,
     "blocked_name": 0
   },
-  "duplicate_lines": 248,
-  "duplicate_endpoints": 394,
+  "duplicate_lines": 238,
+  "duplicate_endpoints": 421,
   "probe": {
-    "tcp_total": 804,
-    "tcp_alive": 639,
-    "udp_unverified": 46,
-    "alive_ratio": 0.7948,
+    "tcp_total": 780,
+    "tcp_alive": 604,
+    "udp_unverified": 49,
+    "alive_ratio": 0.7744,
     "enabled": true,
     "stable_rounds": 2,
-    "stable_kept": 508,
-    "stable_held_back": 177,
+    "stable_kept": 600,
+    "stable_held_back": 53,
     "stable_state": "output/alive.json"
   },
-  "final": 508,
+  "final": 600,
   "by_protocol": {
-    "vless": 182,
-    "vmess": 35,
-    "trojan": 47,
-    "ss": 197,
-    "hysteria2": 46,
+    "vless": 231,
+    "vmess": 69,
+    "trojan": 40,
+    "ss": 210,
+    "hysteria2": 49,
     "ssr": 1
   },
   "encrypted_output": "skipped",
   "remark_prefix": "科技共享-开源节点",
   "clients": {
-    "clash_nodes": 507,
-    "clash_kb": 120.1,
-    "singbox_nodes": 507,
-    "singbox_kb": 164.3
+    "clash_nodes": 599,
+    "clash_kb": 145.7,
+    "singbox_nodes": 599,
+    "singbox_kb": 198.5
   }
 }
