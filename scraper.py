@@ -30,7 +30,7 @@ import sys
 import time
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from urllib.parse import quote, unquote, urlsplit
 
 from convert import to_clash_provider, to_singbox_config
@@ -99,7 +99,8 @@ PROBE_TIMEOUT = float(os.environ.get("PROBE_TIMEOUT", "3"))
 PROBE_WORKERS = int(os.environ.get("PROBE_WORKERS", "96"))
 PROBE_MIN_ALIVE_RATIO = float(os.environ.get("PROBE_MIN_ALIVE_RATIO", "0.05"))
 STABLE_ROUNDS = int(os.environ.get("STABLE_ROUNDS", "2"))   # 连续几轮探活都活才进订阅
-ALIVE_STATE = os.environ.get("ALIVE_STATE", "alive.json")   # 跨轮存活状态（放在 output/ 里随仓库滚动）
+ALIVE_STATE = os.environ.get("ALIVE_STATE", "alive.json")
+ALIVE_TTL_DAYS = float(os.environ.get("ALIVE_TTL_DAYS", "3"))   # 跨轮存活状态（放在 output/ 里随仓库滚动）
 FETCH_WORKERS = int(os.environ.get("FETCH_WORKERS", "8"))
 FETCH_TIMEOUT = float(os.environ.get("FETCH_TIMEOUT", "20"))
 MAX_NODES = int(os.environ.get("MAX_NODES", "2000"))
@@ -346,11 +347,13 @@ def apply_stability_filter(nodes: list[dict], output_dir: str) -> tuple[list[dic
     """
     state_path = os.path.join(output_dir, ALIVE_STATE)
     prev: dict[str, int] = {}
+    prev_seen: dict[str, str] = {}
     fresh = True
     try:
         with open(state_path, encoding="utf-8") as f:
             data = json.load(f)
         prev = {str(k): int(v) for k, v in (data.get("streak") or {}).items()}
+        prev_seen = {str(k): str(v) for k, v in (data.get("seen") or {}).items()}
         fresh = False
     except FileNotFoundError:
         pass
@@ -360,22 +363,39 @@ def apply_stability_filter(nodes: list[dict], output_dir: str) -> tuple[list[dic
     keep: list[dict] = []
     held = 0
     streak: dict[str, int] = {}
+    seen: dict[str, str] = {}
+    now_iso = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    present: set[str] = set()
     for n in nodes:
         if n.get("latency_ms") is None:          # UDP 类：无法探活，直接保留
             keep.append(n)
             continue
         key = f"{n['proto']}|{n['host']}|{n['port']}"
+        present.add(key)
         s = prev.get(key, 0) + 1
         streak[key] = s
+        seen[key] = now_iso
         if fresh or s >= STABLE_ROUNDS:
             keep.append(n)
         else:
             held += 1
 
+    # 本轮没出现的端点：保留它的历史轮数（免费源每隔几小时就换一批，
+    # 若把"这次没出现"当成"重新从 1 开始"，节点永远攒不到 2 轮，订阅会越跑越少）。
+    # 只保留 ALIVE_TTL_DAYS 天内见过的，避免状态文件无限变大。
+    horizon = (datetime.now(timezone.utc) - timedelta(days=ALIVE_TTL_DAYS)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    for key, s in prev.items():
+        if key in present:
+            continue
+        last = prev_seen.get(key, now_iso)
+        if last >= horizon:
+            streak[key] = s
+            seen[key] = last
+
     try:
         os.makedirs(output_dir, exist_ok=True)
         write_file(state_path, json.dumps(
-            {"updated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"), "streak": streak},
+            {"updated": now_iso, "ttl_days": ALIVE_TTL_DAYS, "streak": streak, "seen": seen},
             ensure_ascii=False, indent=0))
     except Exception as exc:  # noqa: BLE001
         print(f"[!] 写 {state_path} 失败：{exc}")
