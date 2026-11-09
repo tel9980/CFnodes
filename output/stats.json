@@ -1,11 +1,11 @@
 {
-  "generated_at_utc": "2026-11-09T03:45:27Z",
-  "duration_s": 17.0,
+  "generated_at_utc": "2026-11-21T12:00:29Z",
+  "duration_s": 25.1,
   "sources": {
     "https://cdn.jsdelivr.net/gh/Pawdroid/Free-servers@main/sub": {
       "ok": true,
-      "lines": 20,
-      "parsed": 20
+      "lines": 9,
+      "parsed": 9
     },
     "https://cdn.jsdelivr.net/gh/mfuu/v2ray@master/v2ray": {
       "ok": false,
@@ -14,13 +14,13 @@
     },
     "https://raw.githubusercontent.com/ermaozi/get_subscribe/main/subscribe/v2ray.txt": {
       "ok": true,
-      "lines": 519,
-      "parsed": 490
+      "lines": 443,
+      "parsed": 412
     },
     "https://raw.githubusercontent.com/chengaopan/AutoMergePublicNodes/master/list.txt": {
       "ok": true,
-      "lines": 454,
-      "parsed": 431
+      "lines": 327,
+      "parsed": 301
     },
     "https://raw.githubusercontent.com/ts-sf/fly/main/v2": {
       "ok": true,
@@ -34,8 +34,8 @@
     },
     "https://raw.githubusercontent.com/roosterkid/openproxylist/main/V2RAY_BASE64.txt": {
       "ok": true,
-      "lines": 150,
-      "parsed": 150
+      "lines": 117,
+      "parsed": 117
     },
     "https://gcore.jsdelivr.net/gh/aews/jd2/v20528.txt": {
       "ok": false,
@@ -43,40 +43,39 @@
       "parsed": 0
     }
   },
-  "parsed": 1492,
+  "parsed": 1240,
   "rejected": {
-    "parse_fail": 52,
+    "parse_fail": 57,
     "blocked_host": 0,
     "blocked_name": 0
   },
-  "duplicate_lines": 248,
-  "duplicate_endpoints": 394,
+  "duplicate_lines": 164,
+  "duplicate_endpoints": 328,
   "probe": {
-    "tcp_total": 804,
-    "tcp_alive": 639,
-    "udp_unverified": 46,
-    "alive_ratio": 0.7948,
+    "tcp_total": 695,
+    "tcp_alive": 504,
+    "udp_unverified": 53,
+    "alive_ratio": 0.7252,
     "enabled": true,
     "stable_rounds": 2,
-    "stable_kept": 508,
-    "stable_held_back": 177,
+    "stable_kept": 501,
+    "stable_held_back": 56,
     "stable_state": "output/alive.json"
   },
-  "final": 508,
+  "final": 501,
   "by_protocol": {
-    "vless": 182,
-    "vmess": 35,
-    "trojan": 47,
-    "ss": 197,
-    "hysteria2": 46,
-    "ssr": 1
+    "vless": 158,
+    "vmess": 71,
+    "trojan": 34,
+    "ss": 185,
+    "hysteria2": 53
   },
   "encrypted_output": "skipped",
   "remark_prefix": "科技共享-开源节点",
   "clients": {
-    "clash_nodes": 507,
-    "clash_kb": 120.1,
-    "singbox_nodes": 507,
-    "singbox_kb": 164.3
+    "clash_nodes": 501,
+    "clash_kb": 125.9,
+    "singbox_nodes": 501,
+    "singbox_kb": 172.3
   }
 }
